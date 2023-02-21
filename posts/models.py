@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import User
 # Create your models here.
 POST_TYPE_CHOICES = [
     ('Notice', '공지사항'),
@@ -21,7 +21,7 @@ class PostType(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(
-        User, # user app 구현 시 커스텀 User 모델 사용
+        User,
         verbose_name='작성자',
         on_delete=models.CASCADE
     )
@@ -34,7 +34,10 @@ class Post(models.Model):
         verbose_name='제목', 
         max_length=100
     )
-    content = models.TextField(verbose_name='내용')
+    content = models.TextField(
+        verbose_name='내용',
+        max_length=300
+    )
     created_at = models.DateTimeField(
         verbose_name='게시글 등록 일자', 
         auto_now_add=True
@@ -45,9 +48,20 @@ class Post(models.Model):
 
 
 class PostUpdatedLog(models.Model):
-    user = models.ForeignKey('user.User', verbose_name='수정자', on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, verbose_name='게시글', on_delete=models.CASCADE)
-    updated_at = models.DateTimeField('게시글 업데이트 일자', auto_now=True)
+    user = models.ForeignKey(
+        'users.User', 
+        verbose_name='수정자', 
+        on_delete=models.CASCADE
+    )
+    post = models.ForeignKey(
+        Post, 
+        verbose_name='게시글', 
+        on_delete=models.CASCADE
+    )
+    updated_at = models.DateTimeField(
+        verbose_name='게시글 업데이트 일자', 
+        auto_now=True
+    )
 
     def __str__(self):
         return f'{self.post} 최근 업데이트 일자 : {self.updated_at}'
